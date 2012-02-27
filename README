@@ -1,0 +1,116 @@
+##Introduction
+
+fFixture provides an easy way of creating sample data (fixtures) for unit testing using [Flourish](http://flourishlib.com).
+
+It recursivly creates records based on JSON fixture files that you provide. By default it will create records for all fixture files it finds, but you can specify use only selected fixtures.
+
+
+##Usage
+
+Create `JSON` fixture files like this `users.json`:
+
+	[
+		{
+			user_id: 1,
+			name: "Will Bond",
+			contribution: "Creator of Flourish"
+		}
+	]
+	
+Create a fixture instance:
+
+	fFixture::setDatabase($db);
+	$fixture = fFixture::create('/path/to/fixture/');
+	
+	$fixture->build();
+	
+Use your newly created objects:
+	
+	$user = new User(1);
+	echo $user->getName() // outputs: Will Bond
+
+Bring everything down again:
+
+	$fixture->tearDown();
+	
+That's pretty much it.
+
+##Unit tests
+
+The whole idea of this class was to ease the creating an maintanance of unit tests. Here is a simple example of how to setup and tear down the fixtures.
+
+The setup, in this case run after each test:
+
+    public function setUp()
+    {
+        $db = fORMDatabase::retrieve();
+        fFixture::setDatabase($db);
+        $this->fixture = fFixture::create('/path/to/fixtures/', array("users", "marketplaces"));
+        $this->fixture->build();
+    }
+
+.. and the tear down:
+    
+    public function tearDown()
+    {
+		$this->fixture->tearDown();
+    }
+
+The fixtures root will typically contain lots of fixtures that can be or is need for several tests. But sometimes you cannot rely on this random data. Maybe you need to know that you have _exactly_ three products or an record with a specific value. In this case you can specify a third parameter - replacments root. Basically when loading the fixtures the fixtures of the replacments root will be used in favor of those in the root directory.
+
+In this case these special `user` objects are placed along with the unit test itself:
+
+	public function setUp()
+        $db = fORMDatabase::retrieve();
+        fFixture::setDatabase($db);
+        $this->fixture = fFixture::create('/path/to/fixtures/', array("users", "marketplaces"), '/path/to/unittest/fixtures/');
+        $this->fixture->build();
+	}
+
+Assume that `/path/to/fixtures/` contains the following:
+
+    ./users.json
+	./shops.json
+	./marketplaces.json
+	
+and that `/path/to/unittest/fixtures/` contains the following:
+
+	./users.json
+	
+Then the build order of the fixtures will be:
+
+1. `/path/to/fixtures/shops` - as `User`s has dependencies on `Shop`s
+2. `/path/to/unittest/fixtures/users.json` - as the unit test has specific `User` fixtures.
+3. `/path/to/fixtures/marketplaces.json` - these are specifed as well but there are no unit test specific versions of these fixtures.
+
+This allows for some flexibility. But note the possibility of failure in case the _root_ fixtures are dependent on a type of fixture that has been overwritten by the unit test fixtures or vice versa.
+	
+##Fixture files
+
+The fixtures, though JSON, will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files.
+
+##Namespaces
+
+If you use namespaces, either make sure that you have included the name spaced classes before running fFixture::create(). Alternativly you can use
+the `fORM::mapClassToTable()` method:
+
+	fORM::mapClassToTable('My\Namespaced\Class', 'classes');
+
+##Limitations
+
+* The class does not handle multiplie cases where you have records split over several database. It will either use the default ORM database or the one you supply using setDatabase().
+* Only table dependency is supported and only at one level.
+* No real key checking, the validity of the records is left to fORM - but it does that pretty good anyway.
+* No schema creation - you need a database setup with all the tables.
+
+##Future
+
+Some ideas for the futre in no particular order:
+
+ - Implement auto-fill mode (missing properties, dependencies, etc.)
+ - Handle selfreferencing patterns like, trees.
+ - Support for complex primary keys
+ - Helper method to easily work references in relationships. (eg. page uses [column layout])
+ - Other input source (eg. string, array)
+ - passing a build tables and drop tables script
+ - nested records
