@@ -2,7 +2,7 @@
 
 fFixture provides an easy way of creating sample data (fixtures) for unit testing using [Flourish](http://flourishlib.com).
 
-It recursivly creates records based on JSON fixture files that you provide. By default it will create records for all fixture files it finds, but you can specify use only selected fixtures.
+It recursively creates records based on JSON fixture files that you provide. By default it will create records for all fixture files it finds, but you can specify to use only selected fixtures.
 
 
 ##Usage
@@ -20,7 +20,7 @@ Create `JSON` fixture files like this `users.json`:
 Create a fixture instance:
 
 	fFixture::setDatabase($db);
-	$fixture = fFixture::create('/path/to/fixture/');
+	$fixture = fFixture::create('/path/to/fixtures/');
 	
 	$fixture->build();
 	
