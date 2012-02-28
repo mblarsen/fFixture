@@ -289,11 +289,11 @@ class fFixture
                 
                 $class_name = fORM::classize($table_name);
 
-                // If join table define class to reuse creation code below
+                // If the class does not exists created it
                 
-                if ($this->isJoin($table_name)) {
+				if (class_exists($class_name) === FALSE) {
                     fORM::defineActiveRecordClass($class_name);
-                }
+				}
                 
                 // Create the records
                 
@@ -342,18 +342,4 @@ class fFixture
             }
         }
     }
-    
-    /**
-     * A bit silly method for identifying join tables
-     *
-     * TODO find replacement
-     */
-    private function isJoin($table_name)
-    {
-        $num_relationships = array_reduce($this->schema->getRelationships($table_name), function ($num, $relation_ship) use ($table_name) { return $num + count($relation_ship); }, 0);
-        $foreign_keys = $this->schema->getKeys($table_name, 'foreign');
-                
-        return count($foreign_keys) === 2 && $num_relationships === 0;
-    }
-	        
 }
