@@ -34,7 +34,7 @@ class fFixture
     static private $database;
     
     /**
-     * Will return a new fFixture instance after parsing the json files found in either $root or $replacements_root.
+     * Return a new fFixture instance after parsing the json files found in either $root or $replacements_root.
      *
      * Only fixtures in $fixture_tables and their dependencies will be created. Leave $fixture_tables empty to build everything.
      *
@@ -87,7 +87,7 @@ class fFixture
     private $tables_to_tear_down;
     
     /**
-     * Will create a new instance
+     * Create a new instance
      */
     public function __construct($root, $db, $fixture_tables = NULL, $replacements_root = NULL)
     {
@@ -112,11 +112,11 @@ class fFixture
     }
     
     /**
-     * Will scan for json files and prepare them for record building.
+     * Scan for json files and prepare them for record building.
      *
      * If a root of replacement fixtures is specified these will have priority to files found in the root directory.
      *
-     * All files are read and parsed, eventhough not all are used for record building.
+     * All files are read and parsed, even though not all are used for record building.
      */
     public function load()
     {
@@ -177,7 +177,7 @@ class fFixture
     }
     
     /**
-     * Will build a queue that is order according to dependencies.
+     * Build a queue that is ordered according to dependencies.
      * 
      * @param $tables_name
      *   Table to build queue for.
@@ -210,7 +210,7 @@ class fFixture
         
         $dependencies = array();
          
-        // Enqueue tables of fks that have optional dependency
+        // Enqueue tables of foreign keys that have optional dependency
 
         foreach ($null_allowed_foreign_keys as $key) {
             foreach ($records as $record) {
@@ -221,7 +221,7 @@ class fFixture
             }
         }
             
-        // Enqueue tables of fks with mandetory dependecy
+        // Enqueue tables of foreign keys with mandatory dependecy
              
         foreach ($not_null_foreign_keys as $key) {
             foreach ($records as $record) {
@@ -256,7 +256,7 @@ class fFixture
     }
         
     /**
-     * Will build the records in order of dependency.
+     * Build the records in order of dependency.
      *
      * @throws fProgrammerException if table does not exists
      * @throws fValidationException if keys are missing or if non-existing properties is specified
@@ -289,7 +289,7 @@ class fFixture
                 
                 $class_name = fORM::classize($table_name);
 
-                // If join table define class to reuse creation code belo0w
+                // If join table define class to reuse creation code below
                 
                 if ($this->isJoin($table_name)) {
                     fORM::defineActiveRecordClass($class_name);
@@ -331,7 +331,7 @@ class fFixture
     }
     
     /**
-     * Will empty tables in the reverse order of their creation.
+     * Empty tables in the reverse order of their creation.
      */
     public function tearDown()
     {
