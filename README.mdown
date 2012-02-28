@@ -33,7 +33,7 @@ Bring everything down again:
 
 	$fixture->tearDown();
 	
-That's pretty much it.
+That's pretty much it. Check the unit tests in `/tests` for a working example.
 
 ##Unit tests
 
