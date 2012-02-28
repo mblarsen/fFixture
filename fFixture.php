@@ -71,6 +71,22 @@ class fFixture
         self::$database = $database;
     	fORMDatabase::attach($database);
     }
+	
+	/**
+	 * Dumps an existing database into mulitiple fixture files.
+	 *
+	 * @param $root
+	 *   The directory in which to dump the fixture files.
+	 * @param $tables
+	 *   An array of table names to dump.
+	 * @param $limits
+	 *   An associative array of table names as keys and values that are the max limit of records to dump.
+	 * @param $dont_follow_dependencies
+	 *   In case of foreign key constraints you can opt not to follow the relation and only create the fixtures from $tables.
+	 */
+	static public function dump($root, $tables = array(), $limits = array(), $dont_follow_dependencies = FALSE)
+	{
+	}
     
     private $root;
     
@@ -329,7 +345,7 @@ class fFixture
         }
         
     }
-    
+	    
     /**
      * Empty tables in the reverse order of their creation.
      */
@@ -354,5 +370,6 @@ class fFixture
         $foreign_keys = $this->schema->getKeys($table_name, 'foreign');
                 
         return count($foreign_keys) === 2 && $num_relationships === 0;
-    }        
+    }
+	        
 }
