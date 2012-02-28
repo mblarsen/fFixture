@@ -27,7 +27,7 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testMissingDatabase()
 	{
-        $this->setExpectedException("fEnvironmentException", "Database not set");
+		$this->setExpectedException("fEnvironmentException", "Database not set");
 		$fixture = fFixture::create(FIXTURES_ROOT);
 	}
 	
