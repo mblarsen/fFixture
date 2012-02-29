@@ -72,6 +72,8 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(1, $shop->buildUsers()->count());
 		$this->assertTrue($user->createShop()->exists());
+		
+		$this->assertEquals("Palle Pallesen", $user->getName());
 	}
 	
 	/**
@@ -129,5 +131,54 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM products")->fetchScalar());
 		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM shops")->fetchScalar());
 		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM categories_products")->fetchScalar());
+	}
+	
+	/**
+	 * Test that only specified fixtures are build.
+	 */
+	public function testPartial()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		$fixture = fFixture::create(FIXTURES_ROOT, array("users"));
+		$fixture->build();
+
+		// Only users and shops by dependency should be build
+		
+		$this->assertEquals(1, self::$db->query("SELECT COUNT(*) FROM users")->fetchScalar());
+		$this->assertEquals(1, self::$db->query("SELECT COUNT(*) FROM shops")->fetchScalar());
+		
+		// The rest should be empty
+		
+		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM categories")->fetchScalar());
+		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM products")->fetchScalar());
+		$this->assertEquals(0, self::$db->query("SELECT COUNT(*) FROM categories_products")->fetchScalar());
+	}
+	
+	/**
+	 * Test that a subset of fixtures is used in stead of those in root. Root is used as fallback.
+	 */
+	public function testSubset()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		$fixture = fFixture::create(FIXTURES_ROOT, array("users"), FIXTURES_ROOT . "/subset");
+		
+		// includes: subset/users.json and shops.json
+		
+		$fixture->build();
+		
+		$shop = new Shop(1);
+		$user = new User(1);
+		
+		$this->assertTrue($shop->exists());
+		$this->assertTrue($user->exists());
+
+		$this->assertEquals(1, $shop->buildUsers()->count());
+		$this->assertTrue($user->createShop()->exists());
+		
+		// The user should be Lars Larsen and not Palle Pallesen
+		
+		$this->assertEquals("Lars Larsen", $user->getName());
 	}
 }
