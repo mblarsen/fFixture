@@ -181,4 +181,48 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 		
 		$this->assertEquals("Lars Larsen", $user->getName());
 	}
+	
+	public function testHookCallback()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		$fixture = fFixture::create(FIXTURES_ROOT, array("products"));
+		
+		// This callback will change the price property of products to 11.95. The fixture is 9.95
+		
+		$fixture->registerHookCallback(fFixture::PreSetBuildHook, "products", function($key, $value, $original_value) {
+			if ('price' === $key) {
+				return 11.95;
+			}
+			return $value;
+		});
+			
+		$fixture->build();
+		
+		$product = new Product(1);
+		
+		$this->assertEquals(11.95, $product->getPrice());
+	}
+
+	public function testGlobalHookCallback()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		
+		// This callback will change the price property of products to 11.95. The fixture is 9.95
+		
+		fFixture::registerGlobalHookCallback(fFixture::PreSetBuildHook, "products", function($key, $value, $original_value) {
+			if ('price' === $key) {
+				return 11.95;
+			}
+			return $value;
+		});
+			
+		$fixture = fFixture::create(FIXTURES_ROOT, array("products"));
+		$fixture->build();
+		
+		$product = new Product(1);
+		
+		$this->assertEquals(11.95, $product->getPrice());
+	}
 }
