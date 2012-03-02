@@ -79,6 +79,20 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 	/**
 	 * Will test the build of the more comples many-to-many and the case where there is more than one relationships.
 	 */
+	public function testManyToMany()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		$fixture = fFixture::create(FIXTURES_ROOT, array("categories_products"));
+		
+		// includes: categories.json, products.json, and categories_products.json
+		
+		$fixture->build();
+	}
+	
+	/**
+	 * Will test the build of the more comples many-to-many and the case where there is more than one relationships.
+	 */
 	public function testComplexBuild()
 	{
 		self::reset();

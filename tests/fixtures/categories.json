@@ -1,1 +1,13 @@
-[{"category_id":1,"name":"Sci-Fi","ordinal":1}]
+[
+    {
+        "category_id": 1, 
+        "name": "Sci-Fi", 
+        "ordinal": 1
+    }, 
+    {
+        "category_id": 2, 
+        "name": "Dark",
+		"parent_id": 1,
+        "ordinal": 1
+    }
+]

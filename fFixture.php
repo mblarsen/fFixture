@@ -232,69 +232,70 @@ class fFixture
     {
 		$schema = $this->schema;
         
-		$column_info = $schema->getColumnInfo($table_name);
-            
-		$foreign_keys = $schema->getKeys($table_name, 'foreign');
-                    
-		$null_allowed_foreign_keys = array();
-		$not_null_foreign_keys = array();
-		$foreign_key_columns = array();
-		$foreign_key_tables = array();
-		foreach ($foreign_keys as $key_data) {
-			$key_column = $key_data['column'];
-			$foreign_key_tables[$key_column] = $key_data['foreign_table'];
-			if ($column_info[$key_column]['not_null'] === FALSE) {
-				$null_allowed_foreign_keys[] = $key_column;
-			} else {
-				$not_null_foreign_keys[] = $key_column;
-			}
-		}
-        
+		$column_info  = $schema->getColumnInfo($table_name);
+        $many_to_one  = $schema->getRelationships($table_name, 'many-to-one');
+		$number_of_relationships = array_reduce($schema->getRelationships($table_name), function($number, $relationships) { return $number + count($relationships); }, 0);
+				
 		$dependencies = array();
-         
-		// Enqueue tables of foreign keys that have optional dependency
 
-		foreach ($null_allowed_foreign_keys as $key) {
-			foreach ($records as $record) {
-				if (property_exists($record, $key)) {
-					$dependencies[] = $foreign_key_tables[$key];
-					break;
+		if ($number_of_relationships === 0) {
+						
+			// Join-table like tables
+			
+			foreach ($schema->getKeys($table_name, 'foreign') as $key_data) {
+				if ($column_info[$key_data['column']]['not_null'] === TRUE) {
+					$dependencies[] = $key_data['foreign_table'];
+				}
+			}
+			
+		} else {
+			
+			// Many-to-one
+			
+			foreach ($many_to_one as $relationship) {
+			
+				$key = $relationship['column'];
+				$foreign_table = $relationship['related_table'];
+			
+				if ($table_name === $foreign_table) {
+					continue;
+				}
+			
+				$required = $column_info[$key]['not_null'] === TRUE;
+			
+				foreach ($records as $record) {
+				
+					if ($required && isset($record->$key) === FALSE) {
+						throw new fProgrammerException('Invalid fixture, %1$s, record requires foreign key %2$s',
+						$table_name,
+						$key);
+					}
+				
+					if (isset($record->$key)) {
+						$dependencies[] = $foreign_table;
+						break;
+					}
 				}
 			}
 		}
-            
-		// Enqueue tables of foreign keys with mandatory dependecy
-             
-		foreach ($not_null_foreign_keys as $key) {
-			foreach ($records as $record) {
-				if (property_exists($record, $key) === FALSE) {
-					throw new fProgrammerException('Invalid fixture, %1$s, record requires foreign key %2$s',
-					$table_name,
-					$key);
-				}
-                
-				$dependencies[] = $foreign_key_tables[$key];
-				break;
-			}
-		}
-        
+
 		$queue = array();
         
 		foreach ($dependencies as $foreign_table) {
             
 			if (isset($this->data[$foreign_table]) === FALSE) {
 				throw new fProgrammerException('Unable to create fixture for, %1$s, due to missing data for dependency %2$s',
-				$table_name,
-				$foreign_table
-			);
-		}
+					$table_name,
+					$foreign_table
+				);
+			}
             
-		$queue = array_merge($queue, $this->buildQueue($foreign_table, $this->data[$foreign_table]));
-	}
+			$queue = array_merge($queue, $this->buildQueue($foreign_table, $this->data[$foreign_table]));
+		}
         
-	$queue[] = $table_name;
+		$queue[] = $table_name;
         
-	return array_unique($queue);
+		return array_unique($queue);
     }
         
     /**

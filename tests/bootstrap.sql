@@ -16,8 +16,10 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
 	category_id INTEGER PRIMARY KEY,
+	parent_id   INTEGER,
 	name        TEXT,
-	ordinal     INTEGER
+	ordinal     INTEGER,
+	FOREIGN KEY(parent_id) REFERENCES categories(category_id)
 );
 
 DROP TABLE IF EXISTS products;
@@ -31,8 +33,8 @@ CREATE TABLE products (
 
 DROP TABLE IF EXISTS categories_products;
 CREATE TABLE categories_products (
-	category_id INTEGER,
-	product_id  INTEGER,
+	category_id INTEGER NOT NULL,
+	product_id  INTEGER NOT NULL,
 	FOREIGN KEY(category_id) REFERENCES categories(category_id),
 	FOREIGN KEY(product_id) REFERENCES products(product_id),
     PRIMARY KEY(category_id, product_id)
