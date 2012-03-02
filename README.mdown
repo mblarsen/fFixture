@@ -16,23 +16,23 @@ Create `JSON` fixture files like this `users.json`:
 			contribution: "Creator of Flourish"
 		}
 	]
-	
+
 Create a fixture instance:
 
 	fFixture::setDatabase($db);
 	$fixture = fFixture::create('/path/to/fixtures/');
 	
 	$fixture->build();
-	
+
 Use your newly created objects:
-	
+
 	$user = new User(1);
 	echo $user->getName() // outputs: Will Bond
 
 Bring everything down again:
 
 	$fixture->tearDown();
-	
+
 That's pretty much it. Check the unit tests in `/tests` for a working example.
 
 ##Unit tests
@@ -50,7 +50,7 @@ The setup, in this case run after each test:
     }
 
 .. and the tear down:
-    
+   
     public function tearDown()
     {
 		$this->fixture->tearDown();
@@ -61,6 +61,7 @@ The fixtures root will typically contain lots of fixtures that can be or is need
 In this case these special `user` objects are placed along with the unit test itself:
 
 	public function setUp()
+	{
         $db = fORMDatabase::retrieve();
         fFixture::setDatabase($db);
         $this->fixture = fFixture::create('/path/to/fixtures/', array("users", "marketplaces"), '/path/to/unittest/fixtures/');
@@ -72,11 +73,11 @@ Assume that `/path/to/fixtures/` contains the following:
     ./users.json
 	./shops.json
 	./marketplaces.json
-	
+
 and that `/path/to/unittest/fixtures/` contains the following:
 
 	./users.json
-	
+
 Then the build order of the fixtures will be:
 
 1. `/path/to/fixtures/shops` - as `User`s has dependencies on `Shop`s
@@ -84,15 +85,14 @@ Then the build order of the fixtures will be:
 3. `/path/to/fixtures/marketplaces.json` - these are specifed as well but there are no unit test specific versions of these fixtures.
 
 This allows for some flexibility. But note the possibility of failure in case the _root_ fixtures are dependent on a type of fixture that has been overwritten by the unit test fixtures or vice versa.
-	
+
 ##Fixture files
 
-The fixtures, though JSON, will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files.
+The fixture files contains an array of JSON literals. Though JSON, the files will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files. You could also go crazy building all the objects from PHP.
 
 ##Namespaces
 
-If you use namespaces, either make sure that you have included the name spaced classes before running fFixture::create(). Alternativly you can use
-the `fORM::mapClassToTable()` method:
+If you use namespaces, either make sure that you have included the name spaced classes before running fFixture::create(). Alternativly you can use the `fORM::mapClassToTable()` method:
 
 	fORM::mapClassToTable('My\Namespaced\Class', 'classes');
 

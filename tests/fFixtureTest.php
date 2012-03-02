@@ -176,7 +176,7 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 	{
 		self::reset();
 		fFixture::setDatabase(fORMDatabase::retrieve());
-		$fixture = fFixture::create(FIXTURES_ROOT, array("users"), FIXTURES_ROOT . "/subset");
+		$fixture = fFixture::create(FIXTURES_ROOT, array("users"), FIXTURES_ROOT . "/subset/");
 		
 		// includes: subset/users.json and shops.json
 		
@@ -196,6 +196,9 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("Lars Larsen", $user->getName());
 	}
 	
+	/**
+	 * Test hook callback.
+	 */
 	public function testHookCallback()
 	{
 		self::reset();
@@ -217,7 +220,10 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 		
 		$this->assertEquals(11.95, $product->getPrice());
 	}
-
+	
+	/**
+	 * Test global hook callback.
+	 */
 	public function testGlobalHookCallback()
 	{
 		self::reset();
@@ -238,5 +244,21 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 		$product = new Product(1);
 		
 		$this->assertEquals(11.95, $product->getPrice());
+	}
+	
+	/**
+	 * Will test the use of PHP to generate fixtures.
+	 */
+	public function testProcedual()
+	{
+		self::reset();
+		fFixture::setDatabase(fORMDatabase::retrieve());
+		$fixture = fFixture::create(FIXTURES_ROOT, array("products"), FIXTURES_ROOT . "/procedual/");
+				
+		$fixture->build();
+		
+		$all_products = fRecordSet::build('Product');
+		
+		$this->assertEquals(100, $all_products->count());
 	}
 }

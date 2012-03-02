@@ -1,0 +1,22 @@
+[
+<?php
+	function generateName() {
+		$first_part = array("The Hunt for", "How I Met", "Diaries of", "Two Men and");
+		$second_part = array("Red October", "Your Mother", "The Sorcerer's Stone", "a Jungle Monkey");
+		$version = array("", "I", "II", "III", "3D", "Directors Cut", "Box-set");
+	
+		return trim($first_part[rand(0, count($first_part) - 1)] . ' ' . $second_part[rand(0, count($second_part) - 1)] . ' ' . $version[rand(0, count($version) - 1)]);
+	}
+
+	for ($i=0; $i < 100; $i++) { 
+		echo '{';
+		echo '"name": "' . generateName() . '",';
+		echo '"product_id": ' . ($i + 1) . ',';
+	    echo '"price": 9.99, "shop_id": 1';
+		echo '}';
+		if ($i < 99) {
+			echo ',';
+		}
+	}
+?>
+]
