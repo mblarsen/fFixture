@@ -39,19 +39,19 @@ class fFixture
 	/**
 	 * Return a new fFixture instance after parsing the json files found in either $root or $replacements_root.
 	 *
-	 * Only fixtures in $fixture_tables and their dependencies will be created. Leave $fixture_tables empty to build everything.
+	 * Only fixtures in $white_list and their dependencies will be created. Leave $white_list empty to build everything.
 	 *
 	 * Replacements root is useful in cases where you need very specific records. You could include these fixtures with the
 	 * unit tests.
 	 *
 	 * @param $root
 	 *   The root of the fixture directory.
-	 * @param $fixture_tables
+	 * @param $white_list
 	 *   An array of fixture table names to include when building. NULL or empty means that every fixture found will be build.
 	 * @param $replacements_root
 	 *
 	 */
-	static public function create($root, $fixture_tables = NULL, $replacements_root = NULL)
+	static public function create($root, $white_list = NULL, $replacements_root = NULL)
 	{
 		$db = self::$database;
         
@@ -59,7 +59,7 @@ class fFixture
 			throw new fEnvironmentException('Database not set');
 		}
 
-		$fixture = new self($root, $db, $fixture_tables, $replacements_root);
+		$fixture = new self($root, $db, $white_list, $replacements_root);
 
 		$fixture->load();
 
@@ -116,7 +116,7 @@ class fFixture
     
 	private $data;
         
-	private $fixture_tables;
+	private $white_list;
     
 	private $tables_to_tear_down;
 	
@@ -125,7 +125,7 @@ class fFixture
 	/**
 	 * Create a new instance
 	 */
-	public function __construct($root, $db, $fixture_tables = NULL, $replacements_root = NULL)
+	public function __construct($root, $db, $white_list = NULL, $replacements_root = NULL)
 	{
 		if ($root instanceof fDirectory) {
 			$this->root = $root;
@@ -144,7 +144,7 @@ class fFixture
 		$this->db = $db;
 		$this->schema = new fSchema($db);
 		$this->data = array();
-		$this->fixture_tables = $fixture_tables;
+		$this->white_list = $white_list;
 		
 		if (isset(self::$glabal_hook_callbacks)) {
 			$this->hook_callbacks  = self::$glabal_hook_callbacks;
@@ -311,12 +311,18 @@ class fFixture
 			// Build queue
         
 			$build_queue = array();
-         
+			
+			// $seed_table_names = 
+			
 			foreach ($this->data as $table_name => $records) {
-				if (empty($this->fixture_tables) || (in_array($table_name, $this->fixture_tables))) {
+				if (empty($this->white_list) || (in_array($table_name, $this->white_list))) {
 					$build_queue = array_merge($build_queue, $this->buildQueue($table_name, $records));
 				} 
 			}
+			
+			// if (empty($this->seeds) === FALSE) {
+			// 	// Adding seeds corresponds to setting fixtures tables
+			// }
 
 			$build_queue = array_unique($build_queue);
 			$this->tables_to_tear_down = $build_queue;
@@ -372,6 +378,18 @@ class fFixture
 
 		}
         
+	}
+	
+	public function addSeed(fFixtureSeed $seed)
+	{
+		// TODO sort out dependencies
+	}
+	
+	private function getSeedTableNames()
+	{
+		foreach ($this->seeds as $seed) {
+			# code...
+		}
 	}
 	
 	/**

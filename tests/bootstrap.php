@@ -15,6 +15,7 @@ fLoader::best();
 // Include fFixture
 
 include dirname(__FILE__) . '/../fFixture.php';
+include dirname(__FILE__) . '/../fFixtureSeed.php';
 
 // Emtpy database
 

@@ -7,7 +7,7 @@ CREATE TABLE shops (
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
 	user_id INTEGER PRIMARY KEY,
-	shop_id INTEGER,
+	shop_id INTEGER NOT NULL,
 	name    TEXT,
 	last_logged_in DATE,
 	FOREIGN KEY(shop_id) REFERENCES shops(shop_id)
@@ -25,10 +25,41 @@ CREATE TABLE categories (
 DROP TABLE IF EXISTS products;
 CREATE TABLE products (
 	product_id  INTEGER PRIMARY KEY,
-	shop_id     INTEGER,
+	shop_id     INTEGER NOT NULL,
 	name        TEXT,
+	version     TEXT,
+	catalog     TEXT,
 	price       REAL,
 	FOREIGN KEY(shop_id) REFERENCES shops(shop_id)
+);
+
+DROP TABLE IF EXISTS product_descriptions;
+CREATE TABLE product_descriptions (
+	product_description_id INTEGER PRIMARY KEY,
+	product_id  INTEGER NOT NULL,
+	description TEXT,
+	locale      TEXT,
+	FOREIGN KEY(product_id) REFERENCES products(product_id)
+);
+
+DROP TABLE IF EXISTS offerings;
+CREATE TABLE offerings (
+	offering_id INTEGER PRIMARY KEY,
+	product_id  INTEGER NOT NULL,
+	price       REAL,
+	valid_from  DATE,
+	valid_until DATE,   
+	version     TEXT,
+	FOREIGN KEY(product_id) REFERENCES products(product_id)
+);
+
+DROP TABLE IF EXISTS price_tiers;
+CREATE TABLE price_tiers (
+	price_tier_id INTEGER PRIMARY KEY,
+	offering_id   INTEGER NOT NULL,
+	min_units     INTEGER NOT NULL,
+	price         REAL,
+	FOREIGN KEY(offering_id) REFERENCES offerings(offering_id)
 );
 
 DROP TABLE IF EXISTS categories_products;
