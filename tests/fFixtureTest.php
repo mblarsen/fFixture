@@ -38,7 +38,8 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setExpectedException("fValidationException");
 		fFixture::setDatabase(self::$db);
-		$fixture = fFixture::create(FIXTURES_ROOT . "/bad/");
+		$fixture = fFixture::create(FIXTURES_ROOT, array("users"), FIXTURES_ROOT . "/bad/");
+		$fixture->validate();
 	}
 	
 	/**
