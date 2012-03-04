@@ -504,18 +504,6 @@ class fFixture
 
 	}
 
-	public function addSeed(fFixtureSeed $seed)
-	{
-		// TODO sort out dependencies
-	}
-
-	private function getSeedTableNames()
-	{
-		foreach ($this->seeds as $seed) {
-			# code...
-		}
-	}
-
 	/**
 	 * Empty tables in the reverse order of their creation.
 	 */
