@@ -43,6 +43,27 @@ class fFxitureTest extends PHPUnit_Framework_TestCase
 	}
 	
 	/**
+	 * Test the case where a record has a non-required foregin key.
+	 */
+	public function testNotRequiredWithoutKey()
+	{
+		fFixture::setDatabase(self::$db);
+		$fixture = fFixture::create(FIXTURES_ROOT, array("pages"), FIXTURES_ROOT . "/not-required/");
+		$fixture->validate();
+	}
+	
+	/**
+	 * Test the case where a record has a non-required foregin key.
+	 */
+	public function testNotRequiredWithKey()
+	{
+		fFixture::setDatabase(self::$db);
+		$fixture = fFixture::create(FIXTURES_ROOT, array("pages"), FIXTURES_ROOT . "/not-required-with-key/");
+		$fixture->validate();
+	}
+	
+	
+	/**
 	 * Test that every fixture is read - we are ready to build.
 	 */
 	public function testReadAll()

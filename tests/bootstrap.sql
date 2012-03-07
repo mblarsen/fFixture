@@ -22,6 +22,15 @@ CREATE TABLE categories (
 	FOREIGN KEY(parent_id) REFERENCES categories(category_id)
 );
 
+DROP TABLE IF EXISTS pages;
+CREATE TABLE pages (
+	page_id INTEGER PRIMARY KEY,
+	shop_id INTEGER,
+	title   TEXT NOT NULL,
+	slug    TEXT NOT NULL,
+	FOREIGN KEY(shop_id) REFERENCES shops(shop_id)
+);
+
 DROP TABLE IF EXISTS products;
 CREATE TABLE products (
 	product_id  INTEGER PRIMARY KEY,
