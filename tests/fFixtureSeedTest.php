@@ -28,7 +28,6 @@ class fFixtureSeedTest extends PHPUnit_Framework_TestCase
 			
 		$this->assertTrue(isset($specs['catalog']));
 		$this->assertEquals('movie', $specs['catalog']['value']);
-		$this->assertEquals(FALSE, $specs['catalog']['random']);
 		$this->assertEquals('catalog', $specs['catalog']['property']);
 	
 		$this->assertTrue(isset($specs['version']));

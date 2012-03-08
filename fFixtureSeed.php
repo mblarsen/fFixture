@@ -135,7 +135,7 @@ class fFixtureSeed
 		
 		if (isset($specs)) {
 			
-			if (isset($specs['function']) || FALSE === (is_array($specs['value']) || isset($specs['min']) || isset($specs['max']))) {
+			if (isset($specs['function']) || FALSE === ((isset($specs['value']) && is_array($specs['value'])) || isset($specs['min']) || isset($specs['max']))) {
 				throw new fProgrammerException("Random function can only be applied to properties with array values or intervals");
 			}
 			
