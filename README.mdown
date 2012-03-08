@@ -1,4 +1,4 @@
-##Introduction
+##fFixture Introduction [![Build Status](https://secure.travis-ci.org/mblarsen/fFixture.png?branch=master)](http://travis-ci.org/mblarsen/fFixture)
 
 fFixture provides an easy way of creating sample data (fixtures) for unit testing using [Flourish](http://flourishlib.com).
 
