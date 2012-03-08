@@ -88,7 +88,27 @@ This allows for some flexibility. But note the possibility of failure in case th
 
 ##Fixture files
 
-The fixture files contains an array of JSON literals. Though JSON, the files will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files. You could also go crazy building all the objects from PHP.
+The fixture files contains an array of JSON literals. Like this `members.json`:
+
+	[
+		{
+			"name":"Michael",
+			"country":"Nepal",
+			"member_since":"2009-05-23"
+		}
+	]
+
+Though JSON, the files will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files.
+
+	[
+		{
+			"name":"Michael",
+			"country":"Nepal",
+			"member_since":"<?php echo data('Y-m-d); ?>"
+		}
+	]
+
+You could also go crazy building all the objects from PHP.
 
 ##Namespaces
 
