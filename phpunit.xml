@@ -2,7 +2,7 @@
 <phpunit backupGlobals="false" createGlobalsReference="true" backupStaticAttributes="false" syntaxCheck="false">
 	<testsuites>
         <testsuite name="fFixture">
-            <directory suffix=".php">.</directory>
+            <directory suffix=".php">./tests/</directory>
         </testsuite>
 	</testsuites>
 </phpunit>
