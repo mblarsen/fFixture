@@ -402,7 +402,7 @@ class fFixture
 
 		// Helper vars
 
-		$now = date('Y:m:i H:i:s', time());
+		$now = date('Y-m-d H:i:s');
 
 		// Source is a JSON fixture file
 
