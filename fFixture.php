@@ -402,7 +402,9 @@ class fFixture
 
 		// Helper vars
 
-		$now = date('Y-m-d H:i:s');
+		$now             = date('Y-m-d H:i:s');
+		$a_moment_ago    = date('Y-m-d H:i:s', strtotime('-5 minutes'));
+		$in_a_moment_ago = date('Y-m-d H:i:s', strtotime('+5 minutes'));
 
 		// Source is a JSON fixture file
 
