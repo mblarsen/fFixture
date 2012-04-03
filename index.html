@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>fFixture by mblarsen</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>fFixture</h1>
+        <p>Provides an easy way of creating sample data (fixtures) for unit testing using Flourish.</p>
+        <p class="view"><a href="https://github.com/mblarsen/fFixture">View the Project on GitHub <small>mblarsen/fFixture</small></a></p>
+        <ul>
+          <li><a href="https://github.com/mblarsen/fFixture/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mblarsen/fFixture/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mblarsen/fFixture">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Introduction</h1>
+
+<p>fFixture provides an easy way of creating sample data (fixtures) for unit testing using <a href="http://flourishlib.com">Flourish</a>.</p>
+
+<p>It recursively creates records based on JSON fixture files that you provide. By default it will create records for all fixture files it finds, but you can specify to use only selected fixtures.</p>
+
+<h2>Usage</h2>
+
+<p>Create <code>JSON</code> fixture files like this <code>users.json</code>:</p>
+
+<pre><code>[
+    {
+        user_id: 1,
+        name: "Will Bond",
+        contribution: "Creator of Flourish"
+    }
+]
+</code></pre>
+
+<p>Create a fixture instance:</p>
+
+<pre><code>fFixture::setDatabase($db);
+$fixture = fFixture::create('/path/to/fixtures/');
+
+$fixture-&gt;build();
+</code></pre>
+
+<p>Use your newly created objects:</p>
+
+<pre><code>$user = new User(1);
+echo $user-&gt;getName() // outputs: Will Bond
+</code></pre>
+
+<p>Bring everything down again:</p>
+
+<pre><code>$fixture-&gt;tearDown();
+</code></pre>
+
+<p>That's pretty much it. Check the unit tests in <code>/tests</code> for a working example.</p>
+
+<h2>Unit tests</h2>
+
+<p>The whole idea of this class was to ease the creating an maintanance of unit tests. Here is a simple example of how to setup and tear down the fixtures.</p>
+
+<p>The setup, in this case run after each test:</p>
+
+<pre><code>public function setUp()
+{
+    $db = fORMDatabase::retrieve();
+    fFixture::setDatabase($db);
+    $this-&gt;fixture = fFixture::create('/path/to/fixtures/', array("users", "marketplaces"));
+    $this-&gt;fixture-&gt;build();
+}
+</code></pre>
+
+<p>.. and the tear down:</p>
+
+<pre><code>public function tearDown()
+{
+    $this-&gt;fixture-&gt;tearDown();
+}
+</code></pre>
+
+<p>The fixtures root will typically contain lots of fixtures that can be or is need for several tests. But sometimes you cannot rely on this random data. Maybe you need to know that you have <em>exactly</em> three products or an record with a specific value. In this case you can specify a third parameter - replacments root. Basically when loading the fixtures the fixtures of the replacments root will be used in favor of those in the root directory.</p>
+
+<p>In this case these special <code>user</code> objects are placed along with the unit test itself:</p>
+
+<pre><code>public function setUp()
+{
+    $db = fORMDatabase::retrieve();
+    fFixture::setDatabase($db);
+    $this-&gt;fixture = fFixture::create('/path/to/fixtures/', array("users", "marketplaces"), '/path/to/unittest/fixtures/');
+    $this-&gt;fixture-&gt;build();
+}
+</code></pre>
+
+<p>Assume that <code>/path/to/fixtures/</code> contains the following:</p>
+
+<pre><code>./users.json
+./shops.json
+./marketplaces.json
+</code></pre>
+
+<p>and that <code>/path/to/unittest/fixtures/</code> contains the following:</p>
+
+<pre><code>./users.json
+</code></pre>
+
+<p>Then the build order of the fixtures will be:</p>
+
+<ol>
+<li>
+<code>/path/to/fixtures/shops</code> - as <code>User</code>s has dependencies on <code>Shop</code>s</li>
+<li>
+<code>/path/to/unittest/fixtures/users.json</code> - as the unit test has specific <code>User</code> fixtures.</li>
+<li>
+<code>/path/to/fixtures/marketplaces.json</code> - these are specifed as well but there are no unit test specific versions of these fixtures.</li>
+</ol><p>This allows for some flexibility. But note the possibility of failure in case the <em>root</em> fixtures are dependent on a type of fixture that has been overwritten by the unit test fixtures or vice versa.</p>
+
+<h2>Fixture files</h2>
+
+<p>The fixture files contains an array of JSON literals. Like this <code>members.json</code>:</p>
+
+<pre><code>[
+    {
+        "name":"Michael",
+        "country":"Nepal",
+        "member_since":"2009-05-23"
+    }
+]
+</code></pre>
+
+<p>Though JSON, the files will first be evaluated as PHP scripts, so you can included <code>&lt;?php echo data('Y-m-d H:i:s); ?&gt;</code> into you JSON files.</p>
+
+<pre><code>[
+    {
+        "name":"Michael",
+        "country":"Nepal",
+        "member_since":"&lt;?php echo data('Y-m-d); ?&gt;"
+    }
+]
+</code></pre>
+
+<p>You could also go crazy building all the objects from PHP.</p>
+
+<h2>Namespaces</h2>
+
+<p>If you use namespaces, either make sure that you have included the name spaced classes before running fFixture::create(). Alternativly you can use the <code>fORM::mapClassToTable()</code> method:</p>
+
+<pre><code>fORM::mapClassToTable('My\Namespaced\Class', 'classes');
+</code></pre>
+
+<h2>Limitations</h2>
+
+<ul>
+<li>The class does not handle multiplie cases where you have records split over several database. It will either use the default ORM database or the one you supply using setDatabase().</li>
+<li>Only table dependency is supported and only at one level.</li>
+<li>No real key checking, the validity of the records is left to fORM - but it does that pretty good anyway.</li>
+<li>No schema creation - you need a database setup with all the tables.</li>
+</ul><h2>Future</h2>
+
+<p>Some ideas for the futre in no particular order:</p>
+
+<ul>
+<li>Implement auto-fill mode (missing properties, dependencies, etc.)</li>
+<li>Handle selfreferencing patterns like, trees.</li>
+<li>Support for complex primary keys</li>
+<li>Helper method to easily work references in relationships. (eg. page uses [column layout])</li>
+<li>Other input source (eg. string, array)</li>
+<li>passing a build tables and drop tables script</li>
+<li>nested records</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mblarsen">mblarsen</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
