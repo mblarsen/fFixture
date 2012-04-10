@@ -1,0 +1,8 @@
+[
+    {
+        "last_logged_in": "2012-01-01 09:30:00", 
+        "name": "Palle Pallesen", 
+        "shop_id": <?php echo $this->key('amazon'), 
+        "user_id": 1
+    }
+]

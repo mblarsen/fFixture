@@ -1,0 +1,6 @@
+[
+    {
+        "name": "Amazon", 
+        "shop_id": <?php echo $this->key('amazon', 1); ?>
+    }
+]
