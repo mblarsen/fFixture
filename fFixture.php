@@ -133,6 +133,8 @@ class fFixture
 	private $column_info;
 	private $foreign_keys;
 
+	private $keys;
+
 	/**
 	 * Create a new instance. Use fFixture::create()
 	 */
@@ -142,6 +144,7 @@ class fFixture
 
 		$this->column_info = array();
 		$this->foreign_keys = array();
+		$this->keys = array();
 
 		$this->ancestor_mode = FALSE;
 		$this->fill_mode = FALSE;
@@ -240,7 +243,7 @@ class fFixture
 			$this->validateFixture($fixture_name);
 		}
 	}
-	
+
     /**
      * Build the records in order of dependency.
      *
@@ -280,9 +283,9 @@ class fFixture
 		}
 
 	}
-	
+
 	// ----------------------------- Private methods -----------------------------
-	
+
 	/**
 	 * Validates a fixture data set.
 	 *
@@ -377,7 +380,7 @@ class fFixture
 			}
 		}
 	}
-	
+
 	/**
 	 * Loads a fixture and makes the fixture data accessible through $this->fixture_data.
 	 *
@@ -402,6 +405,7 @@ class fFixture
 
 		// Helper vars
 
+		$fixture         = $this;
 		$now             = date('Y-m-d H:i:s');
 		$a_moment_ago    = date('Y-m-d H:i:s', strtotime('-5 minutes'));
 		$in_a_moment_ago = date('Y-m-d H:i:s', strtotime('+5 minutes'));
@@ -433,7 +437,7 @@ class fFixture
 
 		}
 	}
-	
+
 
     /**
      * Build a queue that is ordered according to dependencies.
@@ -532,7 +536,7 @@ class fFixture
 
 	/**
 	 * Recursivly builds records.
-	 * 
+	 *
 	 * @param array* $completed_fixtures
 	 *   Completed records is stored in this array
 	 * @param $fixture_data
@@ -628,6 +632,17 @@ class fFixture
 		}
 	}
 
+	public function key($key_name, $value = NULL)
+	{
+		if ($value === NULL) {
+			return $this->keys[$key_name];
+		}
+
+		$this->keys[$key_name] = $value;
+
+		return $value;
+	}
+
 	/**
 	 * Registers a hook callback. Global hooks are registered with the instance fixtures upon creation.
 	 *
@@ -665,7 +680,7 @@ class fFixture
 
 		return $value;
 	}
-	
+
 	/**
 	 * Is the key of fixture a relationship key or not
 	 */
@@ -706,7 +721,7 @@ class fFixture
 
 		return NULL;
 	}
-	
+
 	/**
 	 * Is the key of a fixture a required key or not.
 	 */
