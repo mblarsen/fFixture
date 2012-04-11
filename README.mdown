@@ -35,6 +35,54 @@ Bring everything down again:
 
 That's pretty much it. Check the unit tests in `/tests` for a working example.
 
+##Fixture files
+
+The fixture files contains an array of JSON literals. Like this `members.json`:
+
+	[
+		{
+			"name":"Michael",
+			"country":"Nepal",
+			"member_since":"2009-05-23"
+		}
+	]
+
+Though JSON, the files will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files.
+
+	[
+		{
+			"name":"Michael",
+			"country":"Nepal",
+			"member_since":"<?php echo data('Y-m-d); ?>"
+		}
+	]
+
+You could also go crazy building all the objects from PHP.
+
+##Named keys
+
+Some times you want to build more complex fixtures for you tests. In these cases named keys can be helpful. This example shows the relationship between `Shop` and `Product`. First the shops.json
+
+	[
+		{
+			"name": "Amazon",
+			"shop_id": <?php echo $fixture->key('amazon', 1); ?>
+			"url": "http://amazon.com"
+		}
+	]
+	
+and the products.json:
+
+	[
+		{
+			"name": "The Dick Van Dyke Show",
+			"shop_id": <?php echo $fixture->key('amazon'); ?>,
+			"price": 66.99
+		}
+	]
+
+In this way you don't have to bother getting with getting the IDs right.
+
 ##Unit tests
 
 The whole idea of this class was to ease the creating an maintanance of unit tests. Here is a simple example of how to setup and tear down the fixtures.
@@ -85,30 +133,6 @@ Then the build order of the fixtures will be:
 3. `/path/to/fixtures/marketplaces.json` - these are specifed as well but there are no unit test specific versions of these fixtures.
 
 This allows for some flexibility. But note the possibility of failure in case the _root_ fixtures are dependent on a type of fixture that has been overwritten by the unit test fixtures or vice versa.
-
-##Fixture files
-
-The fixture files contains an array of JSON literals. Like this `members.json`:
-
-	[
-		{
-			"name":"Michael",
-			"country":"Nepal",
-			"member_since":"2009-05-23"
-		}
-	]
-
-Though JSON, the files will first be evaluated as PHP scripts, so you can included `<?php echo data('Y-m-d H:i:s); ?>` into you JSON files.
-
-	[
-		{
-			"name":"Michael",
-			"country":"Nepal",
-			"member_since":"<?php echo data('Y-m-d); ?>"
-		}
-	]
-
-You could also go crazy building all the objects from PHP.
 
 ##Namespaces
 
